@@ -1,0 +1,2212 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FocusFlow Day Planner — Your AI-Powered Productivity OS</title>
+    <meta
+      name="description"
+      content="FocusFlow is an AI-powered productivity system that helps you organize tasks, build habits, and stay focused throughout the day. Free for Android."
+    />
+    <meta name="theme-color" content="#0f172a" />
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+            colors: {
+              navy: {
+                950: "#0a0f1e",
+                DEFAULT: "#0f172a",
+                800: "#1e293b",
+                700: "#2a3a52",
+              },
+              indigo: { DEFAULT: "#6366f1", 400: "#818cf8", 300: "#a5b4fc" },
+              teal: { DEFAULT: "#14b8a6", 400: "#2dd4bf", 300: "#5eead4" },
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              "float-slow": "float 8s ease-in-out infinite",
+              shimmer: "shimmer 3s linear infinite",
+              "pulse-slow": "pulse 4s cubic-bezier(0.4,0,0.6,1) infinite",
+              "fade-up": "fadeUp 0.6s ease forwards",
+              "glow-pulse": "glowPulse 2s ease-in-out infinite",
+            },
+            keyframes: {
+              float: {
+                "0%,100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+              shimmer: {
+                "0%": { backgroundPosition: "-200% center" },
+                "100%": { backgroundPosition: "200% center" },
+              },
+              fadeUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              glowPulse: {
+                "0%,100%": { boxShadow: "0 0 20px rgba(99,102,241,0.4)" },
+                "50%": {
+                  boxShadow:
+                    "0 0 50px rgba(99,102,241,0.8), 0 0 80px rgba(20,184,166,0.3)",
+                },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background-color: #0f172a;
+        color: #ffffff;
+        font-family: "Inter", system-ui, sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #6366f1;
+        border-radius: 3px;
+      }
+
+      /* Shimmer gradient text */
+      .shimmer-text {
+        background: linear-gradient(
+          90deg,
+          #ffffff 0%,
+          #6366f1 25%,
+          #14b8a6 50%,
+          #6366f1 75%,
+          #ffffff 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 4s linear infinite;
+      }
+
+      /* Glassmorphism */
+      .glass {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .glass-strong {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      /* Glow button */
+      .btn-glow {
+        position: relative;
+        background: linear-gradient(135deg, #6366f1 0%, #14b8a6 100%);
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      }
+      .btn-glow:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 0 40px rgba(99, 102, 241, 0.7),
+          0 0 60px rgba(20, 184, 166, 0.3);
+      }
+      .btn-glow:active {
+        transform: translateY(0px);
+      }
+
+      /* Glow card */
+      .glow-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(99, 102, 241, 0.15);
+      }
+      .glow-card:hover {
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow:
+          0 0 30px rgba(99, 102, 241, 0.2),
+          0 8px 32px rgba(0, 0, 0, 0.3);
+        transform: translateY(-4px);
+      }
+
+      /* Background orbs */
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Floating phone */
+      .phone-float {
+        animation: float 6s ease-in-out infinite;
+      }
+      .phone-screen {
+        background: linear-gradient(160deg, #1e293b 0%, #0f1629 100%);
+        border-radius: 28px;
+        border: 2px solid rgba(99, 102, 241, 0.3);
+        box-shadow:
+          0 0 60px rgba(99, 102, 241, 0.3),
+          inset 0 0 30px rgba(99, 102, 241, 0.05);
+      }
+
+      /* Scroll animation targets */
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .scroll-reveal.revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .scroll-reveal-left {
+        opacity: 0;
+        transform: translateX(-40px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .scroll-reveal-left.revealed {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      .scroll-reveal-right {
+        opacity: 0;
+        transform: translateX(40px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .scroll-reveal-right.revealed {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      /* Stagger delay helpers */
+      .delay-100 {
+        transition-delay: 0.1s;
+      }
+      .delay-200 {
+        transition-delay: 0.2s;
+      }
+      .delay-300 {
+        transition-delay: 0.3s;
+      }
+      .delay-400 {
+        transition-delay: 0.4s;
+      }
+      .delay-500 {
+        transition-delay: 0.5s;
+      }
+      .delay-600 {
+        transition-delay: 0.6s;
+      }
+
+      /* Nav blur */
+      .nav-blur {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      /* Gradient dividers */
+      .gradient-line {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(99, 102, 241, 0.5) 50%,
+          transparent 100%
+        );
+      }
+
+      /* Badge */
+      .ai-badge {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.2) 0%,
+          rgba(20, 184, 166, 0.2) 100%
+        );
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 14px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #a5b4fc;
+      }
+
+      /* Heatmap cells */
+      .heatmap-cell {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        transition: transform 0.2s;
+      }
+      .heatmap-cell:hover {
+        transform: scale(1.3);
+      }
+
+      /* Progress bars */
+      .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #6366f1, #14b8a6);
+        transition: width 1.5s ease;
+      }
+
+      /* Feature icon glow */
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.2),
+          rgba(20, 184, 166, 0.2)
+        );
+        border: 1px solid rgba(99, 102, 241, 0.3);
+      }
+
+      /* Noise texture overlay */
+      .noise::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Mobile nav */
+      #mobile-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      #mobile-menu.open {
+        max-height: 400px;
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <!-- ===================== NAVIGATION ===================== -->
+    <nav
+      id="navbar"
+      class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo -->
+          <a href="#hero" class="flex items-center gap-2 group">
+            <img
+              src="logo.png"
+              alt="FocusFlow Logo"
+              class="w-9 h-9 rounded-lg object-contain shadow-lg group-hover:shadow-indigo-500/40 transition-all duration-300"
+              style="background: rgba(255, 255, 255, 0.05); padding: 2px"
+            />
+            <span class="font-semibold text-white text-lg">FocusFlow</span>
+          </a>
+
+          <!-- Desktop Nav -->
+          <div class="hidden md:flex items-center gap-8">
+            <a
+              href="#features"
+              class="text-slate-400 hover:text-white text-sm transition-colors duration-200"
+              >Features</a
+            >
+            <a
+              href="#ai"
+              class="text-slate-400 hover:text-white text-sm transition-colors duration-200"
+              >AI</a
+            >
+            <a
+              href="#how-it-works"
+              class="text-slate-400 hover:text-white text-sm transition-colors duration-200"
+              >How It Works</a
+            >
+            <a
+              href="#analytics"
+              class="text-slate-400 hover:text-white text-sm transition-colors duration-200"
+              >Analytics</a
+            >
+          </div>
+
+          <!-- CTA -->
+          <div class="hidden md:flex items-center gap-3">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.focusflow.dayplanner&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-glow text-white text-sm font-semibold px-5 py-2 rounded-full flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M3.18 23.25c.38.21.82.22 1.21.02l11.67-6.69-2.54-2.54-10.34 9.21zm-1.07-19.34C2.04 4.18 2 4.44 2 4.71v14.58c0 .27.04.53.11.77l.06.06L10.29 12v-.2L2.17 3.85l-.06.06zM20.49 10.7l-2.32-1.33-2.85 2.85 2.85 2.86 2.34-1.34c.67-.38.67-1.66-.02-2.04zM4.39.73L16.06 7.42l-2.54 2.54L3.18.75C3.57.55 4.01.56 4.39.73z"
+                />
+              </svg>
+              Download Free
+            </a>
+          </div>
+
+          <!-- Mobile hamburger -->
+          <button
+            id="menu-btn"
+            class="md:hidden text-slate-400 hover:text-white transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg
+              id="menu-icon-open"
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <svg
+              id="menu-icon-close"
+              class="w-6 h-6 hidden"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden">
+          <div class="glass rounded-xl mx-2 mb-4 p-4 flex flex-col gap-3">
+            <a
+              href="#features"
+              class="text-slate-300 hover:text-white text-sm py-2 transition-colors"
+              onclick="closeMobileMenu()"
+              >Features</a
+            >
+            <a
+              href="#ai"
+              class="text-slate-300 hover:text-white text-sm py-2 transition-colors"
+              onclick="closeMobileMenu()"
+              >AI Features</a
+            >
+            <a
+              href="#how-it-works"
+              class="text-slate-300 hover:text-white text-sm py-2 transition-colors"
+              onclick="closeMobileMenu()"
+              >How It Works</a
+            >
+            <a
+              href="#analytics"
+              class="text-slate-300 hover:text-white text-sm py-2 transition-colors"
+              onclick="closeMobileMenu()"
+              >Analytics</a
+            >
+            <a
+              href="https://play.google.com/store/apps/details?id=com.focusflow.dayplanner&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-glow text-white text-sm font-semibold px-5 py-2.5 rounded-full flex items-center justify-center gap-2 mt-2"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M3.18 23.25c.38.21.82.22 1.21.02l11.67-6.69-2.54-2.54-10.34 9.21zm-1.07-19.34C2.04 4.18 2 4.44 2 4.71v14.58c0 .27.04.53.11.77l.06.06L10.29 12v-.2L2.17 3.85l-.06.06zM20.49 10.7l-2.32-1.33-2.85 2.85 2.85 2.86 2.34-1.34c.67-.38.67-1.66-.02-2.04zM4.39.73L16.06 7.42l-2.54 2.54L3.18.75C3.57.55 4.01.56 4.39.73z"
+                />
+              </svg>
+              Download on Google Play
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== HERO SECTION ===================== -->
+    <section
+      id="hero"
+      class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+    >
+      <!-- Background orbs -->
+      <div class="orb w-96 h-96 bg-indigo-600/30 top-10 -left-32"></div>
+      <div class="orb w-80 h-80 bg-teal-500/20 bottom-20 -right-20"></div>
+      <div
+        class="orb w-64 h-64 bg-indigo-800/40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      ></div>
+
+      <!-- Grid background -->
+      <div
+        class="absolute inset-0 z-0"
+        style="
+          background-image:
+            linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+            linear-gradient(
+              90deg,
+              rgba(99, 102, 241, 0.05) 1px,
+              transparent 1px
+            );
+          background-size: 60px 60px;
+        "
+      ></div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <!-- Left: Text -->
+          <div class="text-center lg:text-left">
+            <!-- Logo + Badge -->
+            <div class="flex flex-col items-center lg:items-start gap-4 mb-6">
+              <img src="logo.png" alt="FocusFlow Logo" class="w-20 h-20 object-contain drop-shadow-lg" style="filter: drop-shadow(0 0 18px rgba(99,102,241,0.5));" />
+              <span class="ai-badge">
+                <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+                Your AI-Powered Productivity OS
+              </span>
+            </div>
+
+            <!-- Headline -->
+            <h1
+              class="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6"
+            >
+              <span class="shimmer-text">Stop wondering</span><br />
+              <span class="text-white">what to do.</span><br />
+              <span
+                class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+                >FocusFlow</span
+              >
+              <span class="text-white"> tells you.</span>
+            </h1>
+
+            <!-- Subheadline -->
+            <p
+              class="text-slate-400 text-lg sm:text-xl leading-relaxed mb-10 max-w-xl mx-auto lg:mx-0"
+            >
+              FocusFlow is an AI-powered productivity system that helps you
+              organize tasks, build habits, and stay focused throughout the day
+              — all in one beautiful app.
+            </p>
+
+            <!-- CTA -->
+            <div
+              class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
+            >
+              <a
+                href="https://play.google.com/store/apps/details?id=com.focusflow.dayplanner&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-glow text-white font-bold px-8 py-4 rounded-full flex items-center justify-center gap-3 text-base sm:text-lg"
+              >
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M3.18 23.25c.38.21.82.22 1.21.02l11.67-6.69-2.54-2.54-10.34 9.21zm-1.07-19.34C2.04 4.18 2 4.44 2 4.71v14.58c0 .27.04.53.11.77l.06.06L10.29 12v-.2L2.17 3.85l-.06.06zM20.49 10.7l-2.32-1.33-2.85 2.85 2.85 2.86 2.34-1.34c.67-.38.67-1.66-.02-2.04zM4.39.73L16.06 7.42l-2.54 2.54L3.18.75C3.57.55 4.01.56 4.39.73z"
+                  />
+                </svg>
+                Download on Google Play
+              </a>
+              <a
+                href="#features"
+                class="glass text-white font-semibold px-8 py-4 rounded-full flex items-center justify-center gap-2 text-base sm:text-lg hover:bg-white/10 transition-all duration-300"
+              >
+                See Features
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </a>
+            </div>
+
+            <!-- Trust badges -->
+            <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
+              <div
+                class="glass flex items-center gap-2 px-4 py-2 rounded-full text-sm text-slate-300"
+              >
+                <span class="text-indigo-400">🤖</span> AI Powered
+              </div>
+              <div
+                class="glass flex items-center gap-2 px-4 py-2 rounded-full text-sm text-slate-300"
+              >
+                <span class="text-teal-400">📶</span> Works Offline
+              </div>
+              <div
+                class="glass flex items-center gap-2 px-4 py-2 rounded-full text-sm text-slate-300"
+              >
+                <span class="text-green-400">🆓</span> Free Android App
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Phone Mockup -->
+          <div class="flex justify-center items-center relative">
+            <!-- Glow behind phone -->
+            <div
+              class="absolute w-72 h-72 bg-indigo-600/30 rounded-full blur-3xl"
+            ></div>
+            <div
+              class="absolute w-48 h-48 bg-teal-500/20 rounded-full blur-2xl translate-x-16 translate-y-8"
+            ></div>
+
+            <!-- Phone -->
+            <div class="phone-float relative z-10">
+              <div
+                class="phone-screen w-64 sm:w-72 mx-auto"
+                style="padding: 12px; aspect-ratio: 9/19"
+              >
+                <!-- Phone notch -->
+                <div class="flex justify-center mb-3">
+                  <div
+                    class="w-20 h-5 rounded-full bg-slate-900/80 flex items-center justify-center"
+                  >
+                    <div class="w-8 h-2 rounded-full bg-slate-700"></div>
+                  </div>
+                </div>
+
+                <!-- App UI Mock -->
+                <div class="space-y-2 px-2">
+                  <!-- Header -->
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <div class="text-xs text-slate-400 mb-0.5">
+                        Good morning 👋
+                      </div>
+                      <div class="font-bold text-white text-sm">
+                        Today's Focus
+                      </div>
+                    </div>
+                    <div
+                      class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center text-xs font-bold"
+                    >
+                      JD
+                    </div>
+                  </div>
+
+                  <!-- AI Suggestion Card -->
+                  <div
+                    class="rounded-xl p-2.5 mb-2"
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        rgba(99, 102, 241, 0.3) 0%,
+                        rgba(20, 184, 166, 0.2) 100%
+                      );
+                      border: 1px solid rgba(99, 102, 241, 0.4);
+                    "
+                  >
+                    <div class="text-xs text-indigo-300 font-semibold mb-0.5">
+                      ⚡ AI Recommends
+                    </div>
+                    <div class="text-white text-xs font-medium">
+                      Start with your deep work task
+                    </div>
+                    <div class="text-slate-400 text-xs">
+                      Peak focus window: 9-11am
+                    </div>
+                  </div>
+
+                  <!-- Task items -->
+                  <div class="space-y-1.5">
+                    <div class="glass rounded-lg p-2 flex items-center gap-2">
+                      <div
+                        class="w-4 h-4 rounded border-2 border-indigo-500 flex items-center justify-center"
+                      >
+                        <svg
+                          class="w-2.5 h-2.5 text-indigo-400"
+                          fill="currentColor"
+                          viewBox="0 0 12 12"
+                        >
+                          <path d="M10 3L5 8 2 5" />
+                        </svg>
+                      </div>
+                      <span class="text-xs text-slate-300 flex-1"
+                        >Review project proposal</span
+                      >
+                      <span class="text-xs text-teal-400">2h</span>
+                    </div>
+                    <div class="glass rounded-lg p-2 flex items-center gap-2">
+                      <div
+                        class="w-4 h-4 rounded border-2 border-slate-600"
+                      ></div>
+                      <span class="text-xs text-white flex-1"
+                        >Team standup meeting</span
+                      >
+                      <span class="text-xs text-slate-400">30m</span>
+                    </div>
+                    <div class="glass rounded-lg p-2 flex items-center gap-2">
+                      <div
+                        class="w-4 h-4 rounded border-2 border-slate-600"
+                      ></div>
+                      <span class="text-xs text-white flex-1"
+                        >Deep work: Q2 planning</span
+                      >
+                      <span class="text-xs text-indigo-400">High</span>
+                    </div>
+                  </div>
+
+                  <!-- Habit tracker mini -->
+                  <div
+                    class="rounded-xl p-2.5 mt-2"
+                    style="
+                      background: rgba(255, 255, 255, 0.04);
+                      border: 1px solid rgba(255, 255, 255, 0.08);
+                    "
+                  >
+                    <div class="text-xs text-slate-400 mb-1.5">
+                      Habit Streak 🔥
+                    </div>
+                    <div class="flex gap-1">
+                      <div class="flex flex-col items-center gap-1">
+                        <div
+                          class="w-6 h-6 rounded bg-indigo-500/60 text-center text-xs leading-6"
+                        >
+                          ✓
+                        </div>
+                        <div class="text-slate-500 text-xs">M</div>
+                      </div>
+                      <div class="flex flex-col items-center gap-1">
+                        <div
+                          class="w-6 h-6 rounded bg-indigo-500/60 text-center text-xs leading-6"
+                        >
+                          ✓
+                        </div>
+                        <div class="text-slate-500 text-xs">T</div>
+                      </div>
+                      <div class="flex flex-col items-center gap-1">
+                        <div
+                          class="w-6 h-6 rounded bg-indigo-500/60 text-center text-xs leading-6"
+                        >
+                          ✓
+                        </div>
+                        <div class="text-slate-500 text-xs">W</div>
+                      </div>
+                      <div class="flex flex-col items-center gap-1">
+                        <div
+                          class="w-6 h-6 rounded bg-teal-500/60 text-center text-xs leading-6"
+                        >
+                          ✓
+                        </div>
+                        <div class="text-slate-500 text-xs">T</div>
+                      </div>
+                      <div class="flex flex-col items-center gap-1">
+                        <div
+                          class="w-6 h-6 rounded border border-slate-600 text-center text-xs leading-6 text-slate-500"
+                        >
+                          –
+                        </div>
+                        <div class="text-slate-500 text-xs">F</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Score bar -->
+                  <div
+                    class="rounded-xl p-2.5"
+                    style="
+                      background: rgba(255, 255, 255, 0.04);
+                      border: 1px solid rgba(255, 255, 255, 0.08);
+                    "
+                  >
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-xs text-slate-400"
+                        >Productivity Score</span
+                      >
+                      <span class="text-xs font-bold text-indigo-300">87%</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 87%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div
+        class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500 animate-bounce"
+      >
+        <span class="text-xs uppercase tracking-widest">Scroll</span>
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+    </section>
+
+    <!-- ===================== PROBLEM SECTION ===================== -->
+    <section id="problem" class="py-24 relative overflow-hidden">
+      <div class="gradient-line mb-0"></div>
+      <div
+        class="orb w-80 h-80 bg-indigo-900/40 -top-20 right-0 blur-3xl"
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 scroll-reveal">
+          <span class="ai-badge mb-6 inline-flex">The Problem</span>
+          <h2 class="text-4xl sm:text-5xl font-black text-white mb-6">
+            Productivity is broken.<br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >We fixed it.</span
+            >
+          </h2>
+          <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+            Every day, millions of people open their task manager and feel
+            overwhelmed instead of focused. Sound familiar?
+          </p>
+        </div>
+
+        <!-- Problem cards -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div class="glass glow-card rounded-2xl p-6 scroll-reveal delay-100">
+            <div class="text-4xl mb-4">😵</div>
+            <h3 class="font-bold text-white text-lg mb-2">Task Overload</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Too many tasks with no clear priority leaves you paralyzed instead
+              of productive.
+            </p>
+          </div>
+          <div class="glass glow-card rounded-2xl p-6 scroll-reveal delay-200">
+            <div class="text-4xl mb-4">🎯</div>
+            <h3 class="font-bold text-white text-lg mb-2">No Clear Priority</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Without a smart system, urgent tasks crowd out important ones
+              every single day.
+            </p>
+          </div>
+          <div class="glass glow-card rounded-2xl p-6 scroll-reveal delay-300">
+            <div class="text-4xl mb-4">🔄</div>
+            <h3 class="font-bold text-white text-lg mb-2">
+              Habits That Never Stick
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              You start strong but lose momentum. Without accountability, habits
+              fade fast.
+            </p>
+          </div>
+          <div class="glass glow-card rounded-2xl p-6 scroll-reveal delay-400">
+            <div class="text-4xl mb-4">📵</div>
+            <h3 class="font-bold text-white text-lg mb-2">
+              Constant Distractions
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Notifications, context-switching, and endless interruptions
+              destroy deep focus.
+            </p>
+          </div>
+        </div>
+
+        <!-- Solution intro -->
+        <div
+          class="glass-strong rounded-3xl p-10 text-center max-w-4xl mx-auto scroll-reveal"
+          style="
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.1);
+          "
+        >
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-teal-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6"
+            style="box-shadow: 0 0 30px rgba(99, 102, 241, 0.5)"
+          >
+            ⚡
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-black text-white mb-4">
+            Introducing
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >FocusFlow</span
+            >
+          </h3>
+          <p class="text-slate-300 text-lg leading-relaxed">
+            FocusFlow uses AI to analyze your tasks, energy levels, and habits —
+            then tells you exactly what to do next. No more decision fatigue. No
+            more lost hours. Just pure, focused productivity every day.
+          </p>
+        </div>
+      </div>
+      <div class="gradient-line mt-24"></div>
+    </section>
+
+    <!-- ===================== FEATURES SECTION ===================== -->
+    <section id="features" class="py-24 relative overflow-hidden">
+      <div class="orb w-96 h-96 bg-teal-900/30 -bottom-20 -left-20"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 scroll-reveal">
+          <span class="ai-badge mb-6 inline-flex">Core Features</span>
+          <h2 class="text-4xl sm:text-5xl font-black text-white mb-6">
+            Everything you need to<br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >own your day</span
+            >
+          </h2>
+          <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+            Six powerful modules, one seamless productivity system. Built for
+            humans who want to get things done.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Card 1: Home Command Center -->
+          <div
+            class="glass glow-card rounded-2xl p-8 scroll-reveal delay-100 relative overflow-hidden group"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-indigo-600/10 rounded-bl-full"
+            ></div>
+            <div class="feature-icon mb-5">🏠</div>
+            <h3 class="font-bold text-white text-xl mb-3">
+              Home Command Center
+            </h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Your entire day at a glance. A smart dashboard that surfaces what
+              matters most right now.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> AI-powered daily brief
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Live task & habit overview
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Productivity score &
+                streaks
+              </li>
+            </ul>
+          </div>
+
+          <!-- Card 2: Timeline Planner -->
+          <div
+            class="glass glow-card rounded-2xl p-8 scroll-reveal delay-200 relative overflow-hidden group"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-teal-600/10 rounded-bl-full"
+            ></div>
+            <div class="feature-icon mb-5">📅</div>
+            <h3 class="font-bold text-white text-xl mb-3">Timeline Planner</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Visual time-blocking that helps you design the perfect day and
+              actually stick to it.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Drag-and-drop scheduling
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Smart time estimation
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Conflict detection & alerts
+              </li>
+            </ul>
+          </div>
+
+          <!-- Card 3: Habit Tracker -->
+          <div
+            class="glass glow-card rounded-2xl p-8 scroll-reveal delay-300 relative overflow-hidden group"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-bl-full"
+            ></div>
+            <div class="feature-icon mb-5">🔥</div>
+            <h3 class="font-bold text-white text-xl mb-3">Habit Tracker</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Build and maintain life-changing habits with streaks, reminders,
+              and visual progress.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Visual streak calendar
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Habit heatmap analytics
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Smart completion reminders
+              </li>
+            </ul>
+          </div>
+
+          <!-- Card 4: Focus Mode -->
+          <div
+            class="glass glow-card rounded-2xl p-8 scroll-reveal delay-200 relative overflow-hidden group"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-indigo-600/10 rounded-bl-full"
+            ></div>
+            <div class="feature-icon mb-5">🎯</div>
+            <h3 class="font-bold text-white text-xl mb-3">Focus Mode</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Lock in and eliminate distractions with Pomodoro timers and
+              immersive focus sessions.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Pomodoro & custom timers
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Ambient sound modes
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Session tracking & insights
+              </li>
+            </ul>
+          </div>
+
+          <!-- Card 5: Smart Inbox -->
+          <div
+            class="glass glow-card rounded-2xl p-8 scroll-reveal delay-300 relative overflow-hidden group"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-teal-600/10 rounded-bl-full"
+            ></div>
+            <div class="feature-icon mb-5">📥</div>
+            <h3 class="font-bold text-white text-xl mb-3">Smart Inbox</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Capture anything instantly — tasks, ideas, links — and let AI help
+              organize and prioritize them.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Quick capture anywhere
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> AI link content analysis
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Auto-tagging & sorting
+              </li>
+            </ul>
+          </div>
+
+          <!-- Card 6: Eisenhower Matrix -->
+          <div
+            class="glass glow-card rounded-2xl p-8 scroll-reveal delay-400 relative overflow-hidden group"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-bl-full"
+            ></div>
+            <div class="feature-icon mb-5">⚖️</div>
+            <h3 class="font-bold text-white text-xl mb-3">Eisenhower Matrix</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Visually prioritize tasks using the legendary urgent/important
+              framework, supercharged with AI.
+            </p>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Drag-drop quadrant sorting
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> AI priority suggestions
+              </li>
+              <li class="flex items-center gap-2 text-slate-300 text-sm">
+                <span class="text-teal-400">→</span> Delegate & eliminate flags
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AI FEATURES SECTION ===================== -->
+    <section id="ai" class="py-24 relative overflow-hidden">
+      <div class="gradient-line"></div>
+      <div class="orb w-96 h-96 bg-indigo-700/25 top-0 right-0"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <!-- Left: AI Visual -->
+          <div class="order-2 lg:order-1 scroll-reveal-left">
+            <div
+              class="glass-strong rounded-3xl p-8 relative overflow-hidden"
+              style="
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                box-shadow: 0 0 50px rgba(99, 102, 241, 0.1);
+              "
+            >
+              <!-- AI Header -->
+              <div class="flex items-center gap-3 mb-6">
+                <div
+                  class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center text-lg"
+                  style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.5)"
+                >
+                  🤖
+                </div>
+                <div>
+                  <div class="text-white font-bold">FocusFlow AI</div>
+                  <div class="text-teal-400 text-xs flex items-center gap-1">
+                    <span
+                      class="w-1.5 h-1.5 rounded-full bg-teal-400 inline-block animate-pulse"
+                    ></span>
+                    Analyzing your day...
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Suggestions -->
+              <div class="space-y-3">
+                <div
+                  class="rounded-xl p-4"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      rgba(99, 102, 241, 0.15),
+                      rgba(20, 184, 166, 0.1)
+                    );
+                    border: 1px solid rgba(99, 102, 241, 0.3);
+                  "
+                >
+                  <div class="text-xs text-indigo-300 font-semibold mb-1">
+                    ⚡ Next Best Action
+                  </div>
+                  <div class="text-white text-sm">
+                    You have a peak focus window in 12 minutes. I recommend
+                    starting "Q2 Strategy Doc" now.
+                  </div>
+                </div>
+                <div
+                  class="rounded-xl p-4"
+                  style="
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                  "
+                >
+                  <div class="text-xs text-teal-300 font-semibold mb-1">
+                    😊 Mood-Based Suggestions
+                  </div>
+                  <div class="text-white text-sm">
+                    Your energy is high this morning — tackle your hardest task
+                    first for maximum output.
+                  </div>
+                </div>
+                <div
+                  class="rounded-xl p-4"
+                  style="
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                  "
+                >
+                  <div class="text-xs text-purple-300 font-semibold mb-1">
+                    ✂️ AI Task Breakdown
+                  </div>
+                  <div class="text-white text-sm">
+                    "Launch campaign" → 6 sub-tasks generated automatically with
+                    time estimates.
+                  </div>
+                </div>
+                <div
+                  class="rounded-xl p-4"
+                  style="
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                  "
+                >
+                  <div class="text-xs text-yellow-300 font-semibold mb-1">
+                    📊 Daily Insight
+                  </div>
+                  <div class="text-white text-sm">
+                    You completed 94% of tasks before 2pm. Morning-heavy
+                    scheduling works best for you.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Text -->
+          <div class="order-1 lg:order-2 scroll-reveal-right">
+            <span class="ai-badge mb-6 inline-flex">
+              <span
+                class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"
+              ></span>
+              Powered by AI
+            </span>
+            <h2 class="text-4xl sm:text-5xl font-black text-white mb-6">
+              AI that works<br />
+              <span
+                class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+                >with you</span
+              >
+            </h2>
+            <p class="text-slate-400 text-lg leading-relaxed mb-8">
+              FocusFlow's AI engine continuously learns your patterns and
+              preferences to deliver intelligent, personalized guidance — not
+              generic advice.
+            </p>
+
+            <div class="space-y-4">
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                >
+                  ⚡
+                </div>
+                <div>
+                  <div class="text-white font-semibold mb-0.5">
+                    AI Next Best Action
+                  </div>
+                  <div class="text-slate-400 text-sm">
+                    Tells you exactly what to work on next based on deadlines,
+                    energy, and priority.
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                >
+                  😊
+                </div>
+                <div>
+                  <div class="text-white font-semibold mb-0.5">
+                    Mood-Based Task Suggestions
+                  </div>
+                  <div class="text-slate-400 text-sm">
+                    Adapts recommendations to how you're feeling for smarter,
+                    sustainable productivity.
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                >
+                  💬
+                </div>
+                <div>
+                  <div class="text-white font-semibold mb-0.5">
+                    Natural Language Task Creation
+                  </div>
+                  <div class="text-slate-400 text-sm">
+                    Type "Call dentist Friday at 3pm" and FocusFlow handles the
+                    rest automatically.
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                >
+                  ✂️
+                </div>
+                <div>
+                  <div class="text-white font-semibold mb-0.5">
+                    AI Sub-Task Breakdown
+                  </div>
+                  <div class="text-slate-400 text-sm">
+                    Big projects auto-split into manageable steps with time
+                    estimates.
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                >
+                  🔗
+                </div>
+                <div>
+                  <div class="text-white font-semibold mb-0.5">
+                    AI Content Analysis for Saved Links
+                  </div>
+                  <div class="text-slate-400 text-sm">
+                    Paste any URL and AI summarizes it so you know if it's worth
+                    your time.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gradient-line mt-8"></div>
+    </section>
+
+    <!-- ===================== GAMIFICATION SECTION ===================== -->
+    <section id="gamification" class="py-24 relative overflow-hidden">
+      <div class="orb w-80 h-80 bg-purple-800/30 bottom-0 left-1/4"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 scroll-reveal">
+          <span class="ai-badge mb-6 inline-flex">Rewards System</span>
+          <h2 class="text-4xl sm:text-5xl font-black text-white mb-6">
+            Productivity that<br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >feels like a game</span
+            >
+          </h2>
+          <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+            Earn badges, build streaks, and rack up points for every productive
+            action. Staying on top of your game has never been this rewarding.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <!-- Badges showcase -->
+          <div class="scroll-reveal-left">
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                class="glass-strong rounded-2xl p-6 text-center glow-card"
+                style="border: 1px solid rgba(99, 102, 241, 0.2)"
+              >
+                <div class="text-5xl mb-3">👣</div>
+                <div class="font-bold text-white mb-1">First Step</div>
+                <div class="text-slate-400 text-xs">
+                  Complete your first task
+                </div>
+                <div class="mt-3 text-xs text-indigo-300 font-semibold">
+                  +50 XP
+                </div>
+              </div>
+              <div
+                class="glass-strong rounded-2xl p-6 text-center glow-card"
+                style="border: 1px solid rgba(20, 184, 166, 0.2)"
+              >
+                <div class="text-5xl mb-3">🔥</div>
+                <div class="font-bold text-white mb-1">On a Roll</div>
+                <div class="text-slate-400 text-xs">7-day streak achieved</div>
+                <div class="mt-3 text-xs text-teal-300 font-semibold">
+                  +200 XP
+                </div>
+              </div>
+              <div
+                class="glass-strong rounded-2xl p-6 text-center glow-card"
+                style="border: 1px solid rgba(168, 85, 247, 0.2)"
+              >
+                <div class="text-5xl mb-3">🎯</div>
+                <div class="font-bold text-white mb-1">Focus Master</div>
+                <div class="text-slate-400 text-xs">10 Pomodoros completed</div>
+                <div class="mt-3 text-xs text-purple-300 font-semibold">
+                  +300 XP
+                </div>
+              </div>
+              <div
+                class="glass-strong rounded-2xl p-6 text-center glow-card"
+                style="border: 1px solid rgba(245, 158, 11, 0.2)"
+              >
+                <div class="text-5xl mb-3">📭</div>
+                <div class="font-bold text-white mb-1">Inbox Zero</div>
+                <div class="text-slate-400 text-xs">
+                  Clear your inbox entirely
+                </div>
+                <div class="mt-3 text-xs text-yellow-300 font-semibold">
+                  +150 XP
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rewards explanation -->
+          <div class="scroll-reveal-right">
+            <h3 class="text-3xl font-black text-white mb-6">
+              Every action earns you<br />
+              <span
+                class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+                >points and badges</span
+              >
+            </h3>
+            <p class="text-slate-400 leading-relaxed mb-8">
+              FocusFlow's gamification layer transforms mundane task management
+              into an engaging daily challenge. Complete tasks, maintain habits,
+              and hit focus sessions to unlock exclusive badges and climb the
+              productivity leaderboard.
+            </p>
+
+            <div class="space-y-4">
+              <div class="glass rounded-xl p-4 flex items-center gap-4">
+                <div class="text-2xl">⭐</div>
+                <div>
+                  <div class="text-white font-semibold">Points System</div>
+                  <div class="text-slate-400 text-sm">
+                    Earn XP for every task completed, habit maintained, and
+                    focus session finished.
+                  </div>
+                </div>
+              </div>
+              <div class="glass rounded-xl p-4 flex items-center gap-4">
+                <div class="text-2xl">🔥</div>
+                <div>
+                  <div class="text-white font-semibold">Streak Tracking</div>
+                  <div class="text-slate-400 text-sm">
+                    Build daily streaks that grow your score multiplier — miss a
+                    day and the streak resets.
+                  </div>
+                </div>
+              </div>
+              <div class="glass rounded-xl p-4 flex items-center gap-4">
+                <div class="text-2xl">🏆</div>
+                <div>
+                  <div class="text-white font-semibold">Achievement Badges</div>
+                  <div class="text-slate-400 text-sm">
+                    Unlock 30+ unique badges as you master different aspects of
+                    productivity.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section id="how-it-works" class="py-24 relative overflow-hidden">
+      <div class="gradient-line"></div>
+      <div class="orb w-72 h-72 bg-teal-800/30 top-0 right-1/4"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center mb-16 scroll-reveal">
+          <span class="ai-badge mb-6 inline-flex">How It Works</span>
+          <h2 class="text-4xl sm:text-5xl font-black text-white mb-6">
+            Up and running in<br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >3 simple steps</span
+            >
+          </h2>
+          <p class="text-slate-400 text-lg max-w-xl mx-auto">
+            No complicated setup. No long onboarding. Just open the app and
+            start building your best day.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 relative">
+          <!-- Connector lines (desktop) -->
+          <div
+            class="hidden md:block absolute top-16 left-1/3 right-1/3 h-px"
+            style="
+              background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(99, 102, 241, 0.5),
+                transparent
+              );
+            "
+          ></div>
+
+          <!-- Step 1 -->
+          <div class="text-center scroll-reveal delay-100">
+            <div class="relative inline-flex items-center justify-center mb-6">
+              <div
+                class="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(99, 102, 241, 0.3),
+                    rgba(20, 184, 166, 0.2)
+                  );
+                  border: 1px solid rgba(99, 102, 241, 0.4);
+                  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+                "
+              >
+                📝
+              </div>
+              <div
+                class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center shadow-lg"
+              >
+                1
+              </div>
+            </div>
+            <h3 class="font-black text-white text-xl mb-3">
+              Add Tasks & Habits
+            </h3>
+            <p class="text-slate-400 leading-relaxed">
+              Type naturally or use voice to capture tasks, set deadlines, and
+              define the habits you want to build into your routine.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="text-center scroll-reveal delay-300">
+            <div class="relative inline-flex items-center justify-center mb-6">
+              <div
+                class="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(99, 102, 241, 0.3),
+                    rgba(20, 184, 166, 0.2)
+                  );
+                  border: 1px solid rgba(20, 184, 166, 0.4);
+                  box-shadow: 0 0 30px rgba(20, 184, 166, 0.3);
+                "
+              >
+                🤖
+              </div>
+              <div
+                class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-teal-500 text-white text-xs font-black flex items-center justify-center shadow-lg"
+              >
+                2
+              </div>
+            </div>
+            <h3 class="font-black text-white text-xl mb-3">Let AI Guide You</h3>
+            <p class="text-slate-400 leading-relaxed">
+              FocusFlow's AI analyzes your tasks, energy levels, and calendar to
+              recommend exactly what to do next — no decision fatigue.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="text-center scroll-reveal delay-500">
+            <div class="relative inline-flex items-center justify-center mb-6">
+              <div
+                class="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(99, 102, 241, 0.3),
+                    rgba(20, 184, 166, 0.2)
+                  );
+                  border: 1px solid rgba(99, 102, 241, 0.4);
+                  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+                "
+              >
+                📈
+              </div>
+              <div
+                class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center shadow-lg"
+              >
+                3
+              </div>
+            </div>
+            <h3 class="font-black text-white text-xl mb-3">
+              Track Progress & Build Streaks
+            </h3>
+            <p class="text-slate-400 leading-relaxed">
+              Watch your productivity score rise, celebrate streak milestones,
+              and review AI-powered weekly insights to keep improving.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="gradient-line mt-8"></div>
+    </section>
+
+    <!-- ===================== ANALYTICS SECTION ===================== -->
+    <section id="analytics" class="py-24 relative overflow-hidden">
+      <div class="orb w-96 h-96 bg-indigo-800/25 -top-20 -right-20"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 scroll-reveal">
+          <span class="ai-badge mb-6 inline-flex">Analytics</span>
+          <h2 class="text-4xl sm:text-5xl font-black text-white mb-6">
+            See your growth<br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >week over week</span
+            >
+          </h2>
+          <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+            Rich analytics and visual reports that show exactly how productive
+            you've been — and where to improve.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Productivity Score -->
+          <div class="glass glow-card rounded-2xl p-8 scroll-reveal delay-100">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <div class="text-slate-400 text-sm mb-1">
+                  Productivity Score
+                </div>
+                <div class="text-white font-black text-4xl">
+                  87<span class="text-2xl text-indigo-400">%</span>
+                </div>
+              </div>
+              <div class="text-4xl">⚡</div>
+            </div>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs text-slate-400 mb-1">
+                  <span>Tasks Done</span
+                  ><span class="text-white font-semibold">92%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 92%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs text-slate-400 mb-1">
+                  <span>Focus Time</span
+                  ><span class="text-white font-semibold">78%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 78%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs text-slate-400 mb-1">
+                  <span>Habits Maintained</span
+                  ><span class="text-white font-semibold">85%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 85%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center gap-2 text-teal-400 text-sm">
+              <span>↑</span> <span>+12% vs last week</span>
+            </div>
+          </div>
+
+          <!-- Weekly Chart -->
+          <div class="glass glow-card rounded-2xl p-8 scroll-reveal delay-200">
+            <div class="text-slate-400 text-sm mb-1">Weekly Completion</div>
+            <div class="text-white font-black text-2xl mb-6">This Week</div>
+            <div class="flex items-end gap-2 h-32">
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 60%;
+                    background: linear-gradient(180deg, #6366f1, #4f46e5);
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">M</div>
+              </div>
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 80%;
+                    background: linear-gradient(180deg, #6366f1, #4f46e5);
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">T</div>
+              </div>
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 55%;
+                    background: linear-gradient(180deg, #6366f1, #4f46e5);
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">W</div>
+              </div>
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 95%;
+                    background: linear-gradient(180deg, #14b8a6, #0d9488);
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">T</div>
+              </div>
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 72%;
+                    background: linear-gradient(180deg, #6366f1, #4f46e5);
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">F</div>
+              </div>
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 45%;
+                    background: linear-gradient(180deg, #6366f1, #4f46e5);
+                    opacity: 0.5;
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">S</div>
+              </div>
+              <div class="flex flex-col items-center gap-1 flex-1">
+                <div
+                  class="w-full rounded-t-sm"
+                  style="
+                    height: 30%;
+                    background: linear-gradient(180deg, #6366f1, #4f46e5);
+                    opacity: 0.5;
+                  "
+                ></div>
+                <div class="text-slate-500 text-xs">S</div>
+              </div>
+            </div>
+            <div class="mt-4 text-slate-400 text-sm">
+              Avg: <span class="text-white font-semibold">8.4 tasks/day</span>
+            </div>
+          </div>
+
+          <!-- Habit Heatmap -->
+          <div class="glass glow-card rounded-2xl p-8 scroll-reveal delay-300">
+            <div class="text-slate-400 text-sm mb-1">Habit Heatmap</div>
+            <div class="text-white font-black text-2xl mb-4">Last 90 Days</div>
+            <div
+              class="grid gap-1 mb-4"
+              style="grid-template-columns: repeat(13, 1fr)"
+            >
+              <!-- Generate heatmap cells with varying opacity -->
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/40"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-teal-500/50"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/50"></div>
+              <div class="heatmap-cell bg-teal-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-teal-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/40"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-teal-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/50"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-teal-500/40"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-teal-500/50"></div>
+              <div class="heatmap-cell bg-teal-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/40"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/50"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-teal-500/50"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-teal-500/40"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-teal-500/50"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-teal-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/40"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/50"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-teal-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-teal-500/50"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-teal-500/40"></div>
+              <div class="heatmap-cell bg-indigo-500/90"></div>
+              <div class="heatmap-cell bg-slate-700/60"></div>
+              <div class="heatmap-cell bg-indigo-500/30"></div>
+              <div class="heatmap-cell bg-teal-500/70"></div>
+              <div class="heatmap-cell bg-indigo-500/60"></div>
+              <div class="heatmap-cell bg-indigo-500/80"></div>
+              <div class="heatmap-cell bg-teal-500/50"></div>
+              <div class="heatmap-cell bg-indigo-500/70"></div>
+              <div class="heatmap-cell bg-teal-500/90"></div>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span>Less</span>
+              <div class="flex gap-1">
+                <div class="w-3 h-3 rounded-sm bg-slate-700/60"></div>
+                <div class="w-3 h-3 rounded-sm bg-indigo-500/40"></div>
+                <div class="w-3 h-3 rounded-sm bg-indigo-500/70"></div>
+                <div class="w-3 h-3 rounded-sm bg-teal-500/70"></div>
+                <div class="w-3 h-3 rounded-sm bg-teal-500/90"></div>
+              </div>
+              <span>More</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DOWNLOAD / CTA SECTION ===================== -->
+    <section id="download" class="py-24 relative overflow-hidden">
+      <div class="gradient-line"></div>
+
+      <!-- CTA background glow -->
+      <div
+        class="orb w-96 h-96 bg-indigo-600/30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-3xl"
+      ></div>
+      <div
+        class="orb w-64 h-64 bg-teal-500/20 top-1/2 right-1/4 blur-2xl"
+      ></div>
+
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+        <div
+          class="glass-strong rounded-3xl p-12 sm:p-16 relative overflow-hidden scroll-reveal"
+          style="
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 80px rgba(99, 102, 241, 0.15);
+          "
+        >
+          <!-- Inner glow orb -->
+          <div
+            class="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-bl-full pointer-events-none"
+          ></div>
+          <div
+            class="absolute bottom-0 left-0 w-48 h-48 bg-indigo-600/10 rounded-tr-full pointer-events-none"
+          ></div>
+
+          <div class="relative z-10">
+            <span class="ai-badge mb-8 inline-flex">Free Download</span>
+            <h2
+              class="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight"
+            >
+              Your most productive<br />
+              <span class="shimmer-text">day starts here.</span>
+            </h2>
+            <p class="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
+              Join thousands of users who've transformed their daily workflow
+              with FocusFlow. Available free on Android — no subscription
+              required.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <a
+                href="https://play.google.com/store/apps/details?id=com.focusflow.dayplanner&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-glow text-white font-bold px-10 py-5 rounded-full flex items-center justify-center gap-3 text-lg"
+              >
+                <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M3.18 23.25c.38.21.82.22 1.21.02l11.67-6.69-2.54-2.54-10.34 9.21zm-1.07-19.34C2.04 4.18 2 4.44 2 4.71v14.58c0 .27.04.53.11.77l.06.06L10.29 12v-.2L2.17 3.85l-.06.06zM20.49 10.7l-2.32-1.33-2.85 2.85 2.85 2.86 2.34-1.34c.67-.38.67-1.66-.02-2.04zM4.39.73L16.06 7.42l-2.54 2.54L3.18.75C3.57.55 4.01.56 4.39.73z"
+                  />
+                </svg>
+                Download on Google Play
+              </a>
+            </div>
+
+            <div
+              class="flex flex-wrap gap-4 justify-center text-sm text-slate-400"
+            >
+              <span class="flex items-center gap-1.5"
+                ><span class="text-green-400">✓</span> 100% Free</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><span class="text-green-400">✓</span> No Ads</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><span class="text-green-400">✓</span> Works Offline</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><span class="text-green-400">✓</span> AI Powered</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gradient-line mt-8"></div>
+    </section>
+
+    <!-- ===================== TRUST SECTION ===================== -->
+    <section id="trust" class="py-20 relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 scroll-reveal">
+          <span class="ai-badge mb-6 inline-flex">About</span>
+          <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">
+            Built by people who care about<br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 to-teal-400 bg-clip-text text-transparent"
+              >your productivity</span
+            >
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div class="glass glow-card rounded-2xl p-8 scroll-reveal delay-100">
+            <div
+              class="w-12 h-12 rounded-xl mb-4 flex items-center justify-center text-xl"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  rgba(99, 102, 241, 0.2),
+                  rgba(20, 184, 166, 0.2)
+                );
+                border: 1px solid rgba(99, 102, 241, 0.3);
+              "
+            >
+              🏛️
+            </div>
+            <h3 class="font-bold text-white text-xl mb-3">QAB Global LLC</h3>
+            <p class="text-slate-400 leading-relaxed">
+              FocusFlow Day Planner is a productivity application owned and
+              operated by <strong class="text-white">QAB Global LLC</strong>. We
+              are committed to building tools that empower people to live and
+              work at their highest potential.
+            </p>
+          </div>
+
+          <div class="glass glow-card rounded-2xl p-8 scroll-reveal delay-200">
+            <div
+              class="w-12 h-12 rounded-xl mb-4 flex items-center justify-center text-xl"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  rgba(99, 102, 241, 0.2),
+                  rgba(20, 184, 166, 0.2)
+                );
+                border: 1px solid rgba(99, 102, 241, 0.3);
+              "
+            >
+              🤖
+            </div>
+            <h3 class="font-bold text-white text-xl mb-3">Xenlix AI</h3>
+            <p class="text-slate-400 leading-relaxed">
+              FocusFlow was developed by
+              <strong class="text-white">Xenlix AI</strong>, a technology
+              initiative focused on building intelligent, AI-powered
+              productivity and automation software for modern professionals.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="glass rounded-2xl p-6 max-w-4xl mx-auto mt-8 text-center scroll-reveal"
+        >
+          <p class="text-slate-400 text-sm leading-relaxed">
+            FocusFlow Day Planner is a productivity application owned by
+            <strong class="text-white">QAB Global LLC</strong> and developed by
+            <strong class="text-white">Xenlix AI</strong>, a technology
+            initiative focused on AI-powered productivity and automation tools.
+            Our mission is to help every person unlock their best, most focused
+            workday through intelligent software.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="relative border-t border-white/5 pt-16 pb-8 overflow-hidden">
+      <div
+        class="orb w-64 h-64 bg-indigo-900/30 bottom-0 right-0 blur-3xl"
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid md:grid-cols-4 gap-10 mb-12">
+          <!-- Brand -->
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-2 mb-4">
+              <img src="logo.png" alt="FocusFlow Logo" class="w-10 h-10 rounded-xl object-contain" style="background: rgba(255,255,255,0.05); padding: 2px;" />
+              <span class="font-bold text-white text-xl">FocusFlow</span>
+              <span class="text-slate-500 text-sm">Day Planner</span>
+            </div>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4 max-w-sm">
+              Plan your day. Focus deeply. Build habits that stick. The
+              AI-powered productivity OS for Android.
+            </p>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.focusflow.dayplanner&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+            >
+              <svg
+                class="w-4 h-4 text-indigo-400"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M3.18 23.25c.38.21.82.22 1.21.02l11.67-6.69-2.54-2.54-10.34 9.21zm-1.07-19.34C2.04 4.18 2 4.44 2 4.71v14.58c0 .27.04.53.11.77l.06.06L10.29 12v-.2L2.17 3.85l-.06.06zM20.49 10.7l-2.32-1.33-2.85 2.85 2.85 2.86 2.34-1.34c.67-.38.67-1.66-.02-2.04zM4.39.73L16.06 7.42l-2.54 2.54L3.18.75C3.57.55 4.01.56 4.39.73z"
+                />
+              </svg>
+              Get it on Google Play
+            </a>
+          </div>
+
+          <!-- Links -->
+          <div>
+            <h4
+              class="font-semibold text-white mb-4 text-sm uppercase tracking-wide"
+            >
+              Product
+            </h4>
+            <div class="space-y-2">
+              <a
+                href="#features"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >Features</a
+              >
+              <a
+                href="#ai"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >AI Features</a
+              >
+              <a
+                href="#gamification"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >Rewards</a
+              >
+              <a
+                href="#analytics"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >Analytics</a
+              >
+              <a
+                href="https://play.google.com/store/apps/details?id=com.focusflow.dayplanner&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+                >Google Play ↗</a
+              >
+            </div>
+          </div>
+
+          <!-- Legal -->
+          <div>
+            <h4
+              class="font-semibold text-white mb-4 text-sm uppercase tracking-wide"
+            >
+              Legal
+            </h4>
+            <div class="space-y-2">
+              <a
+                href="#"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >Privacy Policy</a
+              >
+              <a
+                href="#"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >Terms of Service</a
+              >
+              <a
+                href="#"
+                class="block text-slate-400 hover:text-white text-sm transition-colors"
+                >GitHub ↗</a
+              >
+            </div>
+            <div class="mt-6">
+              <h4
+                class="font-semibold text-white mb-3 text-sm uppercase tracking-wide"
+              >
+                Company
+              </h4>
+              <div class="space-y-1">
+                <div class="text-slate-400 text-xs">QAB Global LLC</div>
+                <div class="text-slate-500 text-xs">Developed by Xenlix AI</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gradient-line mb-8"></div>
+
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-sm"
+        >
+          <div>
+            © 2026 <span class="text-slate-400">QAB Global LLC</span>. All
+            rights reserved.
+          </div>
+          <div>
+            Developed by
+            <span class="text-indigo-400 font-semibold">Xenlix AI</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ===================== JAVASCRIPT ===================== -->
+    <script>
+      // ── Sticky nav with blur ──────────────────────────────────────
+      const navbar = document.getElementById("navbar");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 20) {
+          navbar.classList.add("nav-blur");
+        } else {
+          navbar.classList.remove("nav-blur");
+        }
+      });
+
+      // ── Mobile menu ───────────────────────────────────────────────
+      const menuBtn = document.getElementById("menu-btn");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const menuIconOpen = document.getElementById("menu-icon-open");
+      const menuIconClose = document.getElementById("menu-icon-close");
+      let menuOpen = false;
+
+      menuBtn.addEventListener("click", () => {
+        menuOpen = !menuOpen;
+        mobileMenu.classList.toggle("open", menuOpen);
+        menuIconOpen.classList.toggle("hidden", menuOpen);
+        menuIconClose.classList.toggle("hidden", !menuOpen);
+      });
+
+      function closeMobileMenu() {
+        menuOpen = false;
+        mobileMenu.classList.remove("open");
+        menuIconOpen.classList.remove("hidden");
+        menuIconClose.classList.add("hidden");
+      }
+
+      // ── Scroll reveal ─────────────────────────────────────────────
+      const revealElements = document.querySelectorAll(
+        ".scroll-reveal, .scroll-reveal-left, .scroll-reveal-right",
+      );
+
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("revealed");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -50px 0px" },
+      );
+
+      revealElements.forEach((el) => revealObserver.observe(el));
+
+      // ── Progress bar animation on scroll ─────────────────────────
+      const progressBars = document.querySelectorAll(".progress-fill");
+      const progressObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const bar = entry.target;
+              const targetWidth = bar.style.width;
+              bar.style.width = "0%";
+              setTimeout(() => {
+                bar.style.width = targetWidth;
+              }, 200);
+              progressObserver.unobserve(bar);
+            }
+          });
+        },
+        { threshold: 0.5 },
+      );
+
+      progressBars.forEach((bar) => progressObserver.observe(bar));
+
+      // ── Smooth scroll for anchor links ───────────────────────────
+      document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href");
+          if (href === "#") return;
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            const offset = 80;
+            const top =
+              target.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top, behavior: "smooth" });
+          }
+        });
+      });
+
+      // ── Parallax orbs on mouse move ───────────────────────────────
+      document.addEventListener("mousemove", (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        document.querySelectorAll(".orb").forEach((orb, i) => {
+          const factor = ((i % 3) + 1) * 0.4;
+          orb.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+        });
+      });
+    </script>
+  </body>
+</html>
